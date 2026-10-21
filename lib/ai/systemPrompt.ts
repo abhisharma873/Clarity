@@ -1,6 +1,7 @@
 import type { NumerologyChart } from "@/lib/numerology";
 import type { DecisionType } from "@/lib/decision-types";
 import type { SessionLens } from "@/lib/sessions/types";
+import { formatChartForPrompt } from "./chartContext";
 import { READY_PHRASE } from "./readiness";
 
 export type BuildSystemPromptParams = {
@@ -44,12 +45,7 @@ export function buildSystemPrompt({
 
   if (lens === "numerology" && chart) {
     sections.push(
-      `Numerology context (${chart.system} system):\n` +
-        `- Life Path ${chart.lifePath.value}\n` +
-        `- Birthday Number ${chart.birthdayNumber.value}\n` +
-        `- Destiny ${chart.destiny.value}\n` +
-        `- Soul Urge ${chart.soulUrge.value}\n` +
-        `- Personality ${chart.personality.value}\n\n` +
+      `${formatChartForPrompt(chart)}\n\n` +
         "Use these numbers only as a starting point for reflection, never as " +
         'prediction. For example: "Your life path 5 is often linked with ' +
         'change; how does change feel to you right now?" Never present a ' +

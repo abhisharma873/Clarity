@@ -3,7 +3,12 @@ import type { DecisionType } from "@/lib/decision-types";
 
 export type SessionLens = "reflection" | "numerology";
 
-export type SessionStatus = "started" | "lens_selected" | "chart_ready" | "in_conversation";
+export type SessionStatus =
+  | "started"
+  | "lens_selected"
+  | "chart_ready"
+  | "in_conversation"
+  | "completed";
 
 export type StoredChart = {
   pythagorean: NumerologyChart;

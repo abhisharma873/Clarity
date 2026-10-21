@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MAX_MESSAGE_LENGTH, MAX_USER_MESSAGES } from "@/lib/messages/validate";
 
@@ -33,10 +34,12 @@ export function ConversationView({
   );
   const [isStreaming, setIsStreaming] = useState(false);
   const [readyForPlan, setReadyForPlan] = useState(false);
-  const [planRequested, setPlanRequested] = useState(false);
+  const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
+  const [planError, setPlanError] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [inputText, setInputText] = useState("");
   const hasKickedOff = useRef(false);
+  const router = useRouter();
 
   const sendMessage = useCallback(
     async (text?: string) => {
@@ -132,6 +135,23 @@ export function ConversationView({
     void sendMessage(trimmed);
   }
 
+  async function handleWritePlan() {
+    if (isGeneratingPlan) return;
+    setIsGeneratingPlan(true);
+    setPlanError(null);
+    try {
+      const response = await fetch(`/api/session/${sessionId}/plan`, { method: "POST" });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data?.planId) {
+        throw new Error(data?.error ?? GENERIC_ERROR);
+      }
+      router.push(`/plan/${data.planId}`);
+    } catch (err) {
+      setPlanError(err instanceof Error ? err.message : GENERIC_ERROR);
+      setIsGeneratingPlan(false);
+    }
+  }
+
   const atLimit = userMessageCount >= MAX_USER_MESSAGES;
   const showPlanButton = readyForPlan || userMessageCount >= 4;
 
@@ -170,52 +190,49 @@ export function ConversationView({
         </p>
       )}
 
-      {!planRequested && (
-        <>
-          <div className="text-right text-xs text-stone-400">
-            {userMessageCount} of {MAX_USER_MESSAGES}
-          </div>
+      <div className="text-right text-xs text-stone-400">
+        {userMessageCount} of {MAX_USER_MESSAGES}
+      </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-1.5">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                maxLength={MAX_MESSAGE_LENGTH}
-                disabled={isStreaming || atLimit}
-                placeholder={atLimit ? "You've reached the message limit." : "Type your reply..."}
-                className="flex-1 rounded-xl border border-stone-300 bg-white px-4 py-3 text-base text-stone-900 placeholder:text-stone-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
-              />
-              <button
-                type="submit"
-                disabled={isStreaming || atLimit || !inputText.trim()}
-                className="rounded-full bg-amber-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                Send
-              </button>
-            </div>
-            <span className="text-right text-xs text-stone-400">
-              {inputText.length}/{MAX_MESSAGE_LENGTH}
-            </span>
-          </form>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-1.5">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            maxLength={MAX_MESSAGE_LENGTH}
+            disabled={isStreaming || atLimit || isGeneratingPlan}
+            placeholder={atLimit ? "You've reached the message limit." : "Type your reply..."}
+            className="flex-1 rounded-xl border border-stone-300 bg-white px-4 py-3 text-base text-stone-900 placeholder:text-stone-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
+          />
+          <button
+            type="submit"
+            disabled={isStreaming || atLimit || isGeneratingPlan || !inputText.trim()}
+            className="rounded-full bg-amber-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Send
+          </button>
+        </div>
+        <span className="text-right text-xs text-stone-400">
+          {inputText.length}/{MAX_MESSAGE_LENGTH}
+        </span>
+      </form>
 
-          {showPlanButton && (
-            <button
-              type="button"
-              onClick={() => setPlanRequested(true)}
-              className="w-full rounded-full border border-amber-600 px-6 py-3 text-sm font-semibold text-amber-700 transition-colors hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/20"
-            >
-              Write my plan
-            </button>
-          )}
-        </>
+      {planError && (
+        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+          {planError}
+        </p>
       )}
 
-      {planRequested && (
-        <div className="rounded-2xl bg-amber-50 p-6 text-center text-sm text-amber-900 dark:bg-amber-950/20 dark:text-amber-200">
-          Your written plan will appear here in a future phase.
-        </div>
+      {showPlanButton && (
+        <button
+          type="button"
+          onClick={() => void handleWritePlan()}
+          disabled={isGeneratingPlan}
+          className="w-full rounded-full border border-amber-600 px-6 py-3 text-sm font-semibold text-amber-700 transition-colors hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-60 dark:text-amber-400 dark:hover:bg-amber-950/20"
+        >
+          {isGeneratingPlan ? "Writing your plan..." : "Write my plan"}
+        </button>
       )}
     </div>
   );
