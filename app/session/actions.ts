@@ -9,6 +9,7 @@ import { isValidDecisionText, isValidDecisionType, isValidLens } from "@/lib/ses
 import type { SessionFormState } from "@/lib/sessions/form-state";
 import type { SessionStatus } from "@/lib/sessions/types";
 import { getChart, type NumerologySystem } from "@/lib/numerology";
+import { getCurrentUser } from "@/lib/supabase/user";
 
 const GENERIC_ERROR: SessionFormState = {
   status: "error",
@@ -35,6 +36,7 @@ export async function startSession(
   let sessionId: string;
   try {
     const token = await getOrCreateAnonToken();
+    const user = await getCurrentUser();
     const supabase = getServiceRoleClient();
     const { data, error } = await supabase
       .from("sessions")
@@ -43,6 +45,7 @@ export async function startSession(
         decision_text: decisionText,
         status: "started",
         anon_token: token,
+        user_id: user?.id ?? null,
       })
       .select("id")
       .single();

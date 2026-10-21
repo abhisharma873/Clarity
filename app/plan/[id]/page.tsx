@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { SignInCard } from "@/app/components/SignInCard";
 import { getPlanById } from "@/lib/plans/repository";
 import { getOwnedSession } from "@/lib/sessions/get-session";
 import { FeedbackForm } from "./FeedbackForm";
@@ -124,6 +125,12 @@ export default async function PlanPage({
         </p>
 
         <PlanActions planId={planRow.id} reflectionLine={plan.reflection_line} />
+
+        {!session.user_id && (
+          <div className="print:hidden">
+            <SignInCard redirectTo={`/plan/${planRow.id}`} />
+          </div>
+        )}
 
         <div className="print:hidden">
           <FeedbackForm planId={planRow.id} />

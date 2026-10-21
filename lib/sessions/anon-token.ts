@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-const ANON_TOKEN_COOKIE = "clarity_anon_token";
+export const ANON_TOKEN_COOKIE = "clarity_anon_token";
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 
 /** Read-only — safe to call from Server Components. */
