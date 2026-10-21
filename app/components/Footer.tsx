@@ -7,6 +7,10 @@ export function Footer() {
         &copy; 2026 Clarity &middot;{" "}
         <Link href="/privacy" className="underline hover:text-stone-700 dark:hover:text-stone-300">
           Privacy
+        </Link>{" "}
+        &middot;{" "}
+        <Link href="/terms" className="underline hover:text-stone-700 dark:hover:text-stone-300">
+          Terms
         </Link>
       </p>
     </footer>

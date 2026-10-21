@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { signInWithEmail, signInWithGoogle } from "@/app/auth/actions";
 import { INITIAL_EMAIL_SIGNIN_STATE } from "@/app/auth/form-state";
@@ -64,6 +65,18 @@ export function SignInCard({
           </button>
         </form>
       )}
+
+      <p className="text-center text-xs text-stone-400">
+        By continuing, you agree to our{" "}
+        <Link href="/terms" className="underline hover:text-stone-600 dark:hover:text-stone-300">
+          Terms
+        </Link>{" "}
+        and{" "}
+        <Link href="/privacy" className="underline hover:text-stone-600 dark:hover:text-stone-300">
+          Privacy
+        </Link>{" "}
+        policy.
+      </p>
     </section>
   );
 }

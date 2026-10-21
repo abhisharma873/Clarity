@@ -1,6 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { captureServerEvent } from "@/lib/analytics/server";
+import { getServerDistinctId } from "@/lib/analytics/distinct-id";
 import { getServiceRoleClient } from "@/lib/supabase/server";
 import { getOrCreateAnonToken } from "@/lib/sessions/anon-token";
 import { getOwnedSession } from "@/lib/sessions/get-session";
@@ -60,6 +62,7 @@ export async function startSession(
     return GENERIC_ERROR;
   }
 
+  await captureServerEvent("session_started", await getServerDistinctId());
   redirect(getStepHref("lens", sessionId));
 }
 
@@ -83,6 +86,8 @@ export async function chooseLens(formData: FormData): Promise<void> {
   if (error) {
     throw new Error("Failed to update session lens.");
   }
+
+  await captureServerEvent("lens_chosen", await getServerDistinctId(), { lens });
 
   const nextStep = lens === "reflection" ? "conversation" : "details";
   redirect(getStepHref(nextStep, sessionId));

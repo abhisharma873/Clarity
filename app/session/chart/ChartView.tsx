@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import posthog from "posthog-js";
+import { useEffect, useState } from "react";
 import { setNumerologySystem, startConversation } from "@/app/session/actions";
 import type { NumerologySystem } from "@/lib/numerology";
 import type { StoredChart } from "@/lib/sessions/types";
@@ -29,6 +30,10 @@ export function ChartView({
 }) {
   const [system, setSystem] = useState<NumerologySystem>(initialSystem);
   const current = chart[system];
+
+  useEffect(() => {
+    posthog.capture("chart_viewed");
+  }, []);
 
   function handleToggle(next: NumerologySystem) {
     setSystem(next);

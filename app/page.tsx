@@ -1,3 +1,4 @@
+import { EventOnMount } from "@/app/components/EventOnMount";
 import { Footer } from "@/app/components/Footer";
 import { WaitlistForm } from "@/app/components/WaitlistForm";
 
@@ -45,6 +46,7 @@ function CheckIcon() {
 export default function Home() {
   return (
     <div className="flex flex-1 flex-col font-sans">
+      <EventOnMount event="landing_viewed" />
       <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-16 px-6 py-16 sm:gap-20 sm:py-24">
         {/* Hero */}
         <section className="flex flex-col items-center gap-5 text-center">

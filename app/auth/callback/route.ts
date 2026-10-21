@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import { captureServerEvent } from "@/lib/analytics/server";
 import { ANON_TOKEN_COOKIE, readAnonToken } from "@/lib/sessions/anon-token";
-import { upsertProfile } from "@/lib/profiles/repository";
+import { getProfile, upsertProfile } from "@/lib/profiles/repository";
 import { getServiceRoleClient, getUserClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request): Promise<Response> {
@@ -45,7 +46,12 @@ export async function GET(request: Request): Promise<Response> {
       }
     }
 
+    const isNewSignup = !(await getProfile(userId));
     await upsertProfile(userId);
+
+    if (isNewSignup) {
+      await captureServerEvent("signup_completed", `user:${userId}`);
+    }
 
     const response = NextResponse.redirect(redirectTarget);
     response.cookies.delete(ANON_TOKEN_COOKIE);

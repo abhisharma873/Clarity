@@ -1,6 +1,8 @@
 "use server";
 
 import { headers } from "next/headers";
+import { captureServerEvent } from "@/lib/analytics/server";
+import { getServerDistinctId } from "@/lib/analytics/distinct-id";
 import { getServiceRoleClient } from "@/lib/supabase/server";
 import { isValidDecisionType, validateEmail } from "@/lib/waitlist/validate";
 import { isRateLimited } from "@/lib/waitlist/rate-limit";
@@ -66,6 +68,7 @@ export async function joinWaitlist(
       return GENERIC_ERROR_STATE;
     }
 
+    await captureServerEvent("waitlist_joined", await getServerDistinctId());
     return { status: "success", message: SUCCESS_MESSAGE };
   } catch (err) {
     console.error("Unexpected error joining waitlist:", err);

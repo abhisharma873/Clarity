@@ -1,5 +1,6 @@
 "use client";
 
+import posthog from "posthog-js";
 import { useState } from "react";
 
 export function PlanActions({
@@ -14,8 +15,16 @@ export function PlanActions({
 
   const cardUrl = `/api/card/${planId}?includeDecision=${includeDecision ? "1" : "0"}`;
 
+  function handleDownload() {
+    // Fire-and-forget: records the first-download timestamp for the admin
+    // funnel and fires card_downloaded server-side. Never blocks the
+    // browser's own download of the <a download> link.
+    fetch(`/api/plan/${planId}/card-downloaded`, { method: "POST" }).catch(() => {});
+  }
+
   async function handleShare() {
     const url = window.location.href;
+    posthog.capture("card_shared");
 
     if (typeof navigator.share === "function") {
       try {
@@ -59,6 +68,7 @@ export function PlanActions({
         <a
           href={cardUrl}
           download="clarity-card.png"
+          onClick={handleDownload}
           className="rounded-full border border-stone-300 px-5 py-3 text-sm font-medium text-stone-700 transition-colors hover:border-amber-500 dark:border-stone-700 dark:text-stone-200"
         >
           Download card

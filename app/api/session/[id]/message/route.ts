@@ -1,4 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { isDoNotTrack, sendServerEvent } from "@/lib/analytics/server";
+import { getServerDistinctId } from "@/lib/analytics/distinct-id";
 import { getAnthropicClient, getClaudeModel } from "@/lib/ai/client";
 import { KICKOFF_USER_TEXT } from "@/lib/ai/kickoff";
 import { isReadyForPlan } from "@/lib/ai/readiness";
@@ -137,6 +139,13 @@ export async function POST(
   const { sessionId, isKickoff, userText, userMessageCount, claudeHistory, systemPrompt } =
     prepared.data;
 
+  // Resolved here, not inside the stream below: cookies()/headers() need the
+  // request's AsyncLocalStorage context, which a ReadableStream's start()
+  // callback — invoked by the Streams API's own internal machinery — isn't
+  // guaranteed to preserve.
+  const distinctId = await getServerDistinctId();
+  const dnt = await isDoNotTrack();
+
   const encoder = new TextEncoder();
 
   const readable = new ReadableStream({
@@ -172,6 +181,10 @@ export async function POST(
           await insertTurn(sessionId, userText, replyText);
         }
         await insertUsage(sessionId, finalMessage.usage.input_tokens, finalMessage.usage.output_tokens);
+
+        if (!isKickoff && !dnt) {
+          await sendServerEvent("conversation_message_sent", distinctId);
+        }
 
         const newUserMessageCount = isKickoff ? userMessageCount : userMessageCount + 1;
         enqueue({

@@ -1,4 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { captureServerEvent } from "@/lib/analytics/server";
+import { getServerDistinctId } from "@/lib/analytics/distinct-id";
 import { getAnthropicClient, getClaudeModel } from "@/lib/ai/client";
 import { parsePlanJson } from "@/lib/ai/parsePlan";
 import { buildPlanSystemPrompt } from "@/lib/ai/planPrompt";
@@ -92,6 +94,8 @@ export async function POST(
 
     const supabase = getServiceRoleClient();
     await supabase.from("sessions").update({ status: "completed" }).eq("id", session.id);
+
+    await captureServerEvent("plan_generated", await getServerDistinctId());
 
     return Response.json({ planId: planRow.id });
   } catch (err) {
