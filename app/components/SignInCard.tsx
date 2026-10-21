@@ -59,7 +59,7 @@ export function SignInCard({
           <button
             type="submit"
             disabled={isPending}
-            className="w-full rounded-full bg-amber-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-full bg-amber-700 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isPending ? "Sending..." : "Email me a sign-in link"}
           </button>

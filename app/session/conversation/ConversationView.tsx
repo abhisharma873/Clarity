@@ -170,7 +170,7 @@ export function ConversationView({
               key={index}
               className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                 message.role === "user"
-                  ? "self-end bg-amber-600 text-white"
+                  ? "self-end bg-amber-700 text-white"
                   : "self-start bg-stone-100 text-stone-900 dark:bg-stone-800 dark:text-stone-100"
               }`}
             >
@@ -208,7 +208,7 @@ export function ConversationView({
           <button
             type="submit"
             disabled={isStreaming || atLimit || isGeneratingPlan || !inputText.trim()}
-            className="rounded-full bg-amber-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-full bg-amber-700 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Send
           </button>

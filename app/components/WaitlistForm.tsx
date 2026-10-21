@@ -86,7 +86,7 @@ export function WaitlistForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="mt-1 w-full rounded-full bg-amber-600 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-1 w-full rounded-full bg-amber-700 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isPending ? "Joining..." : "Join the waitlist"}
       </button>

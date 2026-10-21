@@ -2,6 +2,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { isDoNotTrack, sendServerEvent } from "@/lib/analytics/server";
 import { getServerDistinctId } from "@/lib/analytics/distinct-id";
 import { getAnthropicClient, getClaudeModel } from "@/lib/ai/client";
+import { CAPACITY_MESSAGE, hasReachedDailyAiCallLimit } from "@/lib/ai/daily-limit";
 import { KICKOFF_USER_TEXT } from "@/lib/ai/kickoff";
 import { isReadyForPlan } from "@/lib/ai/readiness";
 import { buildSystemPrompt } from "@/lib/ai/systemPrompt";
@@ -52,6 +53,10 @@ async function prepareRequest(request: Request, sessionId: string): Promise<Prep
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   if (isMessageRateLimited(ip)) {
     return { ok: false, response: jsonError("Too many requests. Please try again in a while.", 429) };
+  }
+
+  if (await hasReachedDailyAiCallLimit()) {
+    return { ok: false, response: jsonError(CAPACITY_MESSAGE, 503) };
   }
 
   let body: { message?: string };

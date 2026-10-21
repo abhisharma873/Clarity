@@ -29,7 +29,7 @@ export function NoteForm({ checkInId }: { checkInId: string }) {
       <button
         type="submit"
         disabled={isPending}
-        className="self-start rounded-full bg-amber-600 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
+        className="self-start rounded-full bg-amber-700 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-800 disabled:cursor-not-allowed disabled:opacity-60"
       >
         Save
       </button>

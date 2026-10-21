@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { isSignInRateLimited } from "@/lib/auth/rate-limit";
 import { validateEmail } from "@/lib/waitlist/validate";
 import { getUserClient } from "@/lib/supabase/server";
 import type { EmailSignInState } from "./form-state";
@@ -39,6 +40,12 @@ export async function signInWithEmail(
 
   if (!validateEmail(email)) {
     return { status: "error", message: "Please enter a valid email address." };
+  }
+
+  const headerList = await headers();
+  const ip = headerList.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  if (isSignInRateLimited(ip)) {
+    return { status: "error", message: "Too many attempts. Please try again in a few minutes." };
   }
 
   const supabase = await getUserClient();

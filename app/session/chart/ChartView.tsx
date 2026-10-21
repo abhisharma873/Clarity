@@ -91,7 +91,7 @@ export function ChartView({
         <input type="hidden" name="sessionId" value={sessionId} />
         <button
           type="submit"
-          className="w-full rounded-full bg-amber-600 px-6 py-4 text-base font-semibold text-white transition-colors hover:bg-amber-700"
+          className="w-full rounded-full bg-amber-700 px-6 py-4 text-base font-semibold text-white transition-colors hover:bg-amber-800"
         >
           Start my clarity session
         </button>

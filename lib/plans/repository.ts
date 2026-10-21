@@ -19,6 +19,22 @@ export async function getPlanById(planId: string | null | undefined): Promise<Pl
   return data as PlanRow;
 }
 
+/** Used to make plan generation idempotent — a session should only ever get one plan. */
+export async function getPlanBySessionId(sessionId: string): Promise<PlanRow | null> {
+  const supabase = getServiceRoleClient();
+  const { data, error } = await supabase
+    .from("plans")
+    .select("*")
+    .eq("session_id", sessionId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return data as PlanRow;
+}
+
 export async function createPlan(sessionId: string, plan: ClarityPlan): Promise<PlanRow> {
   const supabase = getServiceRoleClient();
   const { data, error } = await supabase

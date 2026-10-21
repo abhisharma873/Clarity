@@ -77,7 +77,7 @@ export function PlanActions({
         <button
           type="button"
           onClick={handleShare}
-          className="rounded-full bg-amber-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-700"
+          className="rounded-full bg-amber-700 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-amber-800"
         >
           {copied ? "Link copied!" : "Share"}
         </button>

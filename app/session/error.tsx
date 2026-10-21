@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-export default function SessionError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function SessionError({ retry }: { error: unknown; retry: () => void }) {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6 text-center font-sans">
       <h1 className="text-2xl font-semibold text-stone-900 dark:text-stone-50">
@@ -14,14 +14,14 @@ export default function SessionError({ reset }: { error: Error & { digest?: stri
       <div className="flex gap-3">
         <button
           type="button"
-          onClick={reset}
+          onClick={() => retry()}
           className="rounded-full border border-stone-300 px-5 py-3 text-sm font-medium text-stone-700 dark:border-stone-700 dark:text-stone-200"
         >
           Try again
         </button>
         <Link
           href="/session/start"
-          className="rounded-full bg-amber-600 px-5 py-3 text-sm font-semibold text-white hover:bg-amber-700"
+          className="rounded-full bg-amber-700 px-5 py-3 text-sm font-semibold text-white hover:bg-amber-800"
         >
           Start over
         </Link>

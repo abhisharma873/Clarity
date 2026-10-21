@@ -2,11 +2,13 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { captureServerEvent } from "@/lib/analytics/server";
 import { getServerDistinctId } from "@/lib/analytics/distinct-id";
 import { getAnthropicClient, getClaudeModel } from "@/lib/ai/client";
+import { CAPACITY_MESSAGE, hasReachedDailyAiCallLimit } from "@/lib/ai/daily-limit";
 import { parsePlanJson } from "@/lib/ai/parsePlan";
 import { buildPlanSystemPrompt } from "@/lib/ai/planPrompt";
 import { formatTranscript } from "@/lib/ai/transcript";
-import { getMessagesForSession } from "@/lib/messages/repository";
-import { createPlan } from "@/lib/plans/repository";
+import { getMessagesForSession, insertUsage } from "@/lib/messages/repository";
+import { createPlan, getPlanBySessionId } from "@/lib/plans/repository";
+import { isPlanGenerationRateLimited } from "@/lib/plans/rate-limit";
 import { getOwnedSession } from "@/lib/sessions/get-session";
 import { getServiceRoleClient } from "@/lib/supabase/server";
 
@@ -19,7 +21,7 @@ function jsonError(message: string, status: number): Response {
 type ClaudeTurn = { role: "user" | "assistant"; content: string };
 
 export async function POST(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   const { id } = await params;
@@ -31,6 +33,23 @@ export async function POST(
     }
     if (!session.lens) {
       return jsonError("This session hasn't chosen a lens yet.", 400);
+    }
+
+    // A session should only ever get one plan — short-circuits a direct
+    // repeated POST (bypassing the UI's client-side disabled-button guard)
+    // into returning the existing plan instead of paying for another.
+    const existingPlan = await getPlanBySessionId(session.id);
+    if (existingPlan) {
+      return Response.json({ planId: existingPlan.id });
+    }
+
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    if (isPlanGenerationRateLimited(ip)) {
+      return jsonError("Too many requests. Please try again in a while.", 429);
+    }
+
+    if (await hasReachedDailyAiCallLimit()) {
+      return jsonError(CAPACITY_MESSAGE, 503);
     }
 
     const messages = await getMessagesForSession(session.id);
@@ -54,18 +73,19 @@ export async function POST(
     const client = getAnthropicClient();
     const model = getClaudeModel();
 
-    async function callClaude(turns: ClaudeTurn[]): Promise<string> {
+    const callClaude = async (turns: ClaudeTurn[]): Promise<string> => {
       const response = await client.messages.create({
         model,
         max_tokens: 1000,
         system: systemPrompt,
         messages: turns,
       });
+      await insertUsage(session.id, response.usage.input_tokens, response.usage.output_tokens);
       return response.content
         .filter((block): block is Anthropic.TextBlock => block.type === "text")
         .map((block) => block.text)
         .join("");
-    }
+    };
 
     const firstTurns: ClaudeTurn[] = [{ role: "user", content: transcript }];
     const firstReply = await callClaude(firstTurns);

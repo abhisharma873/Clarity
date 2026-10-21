@@ -14,10 +14,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const TITLE = "Clarity — A clarity session, not a prediction";
+const DESCRIPTION =
+  "Facing a big decision? Get clarity in 10 minutes with a guided reflection or numerology-based session.";
+
 export const metadata: Metadata = {
-  title: "Clarity — A clarity session, not a prediction",
-  description:
-    "Facing a big decision? Get clarity in 10 minutes with a guided reflection or numerology-based session.",
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+    siteName: "Clarity",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -79,7 +79,7 @@ export default function Home() {
           <ol className="mt-6 flex flex-col gap-6 sm:flex-row sm:gap-4">
             {STEPS.map(({ step, title, body }) => (
               <li key={step} className="flex flex-1 flex-col gap-1.5 text-center">
-                <span className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-amber-600 text-sm font-semibold text-white">
+                <span className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-amber-700 text-sm font-semibold text-white">
                   {step}
                 </span>
                 <span className="font-medium text-stone-800 dark:text-stone-100">{title}</span>
