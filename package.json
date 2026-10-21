@@ -11,11 +11,13 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.137.0",
+    "@react-email/components": "^1.0.12",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
     "next": "16.4.2",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "resend": "^6.34.1"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",

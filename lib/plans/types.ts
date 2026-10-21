@@ -18,6 +18,7 @@ export type PlanRow = {
   plan: ClarityPlan;
   feedback: Feedback | null;
   check_in_date: string;
+  check_in_sent_at: string | null;
   created_at: string;
 };
 
