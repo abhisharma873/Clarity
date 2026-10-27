@@ -1,6 +1,6 @@
 import type { PlanRow } from "@/lib/plans/types";
 import { CHECK_IN_EMAIL_SUBJECT, CheckInEmail } from "@/lib/email/CheckInEmail";
-import { getCheckInFromAddress, getResendClient } from "@/lib/email/resend";
+import { getFromAddress, getResendClient } from "@/lib/email/resend";
 import { signCheckInToken } from "./token";
 
 /** Builds a fresh signed token and sends the check-in email. Does not mark anything as sent — callers decide that. */
@@ -10,7 +10,7 @@ export async function sendCheckInEmail(plan: PlanRow, toEmail: string, baseUrl: 
 
   const resend = getResendClient();
   const { error } = await resend.emails.send({
-    from: getCheckInFromAddress(),
+    from: getFromAddress(),
     to: toEmail,
     subject: CHECK_IN_EMAIL_SUBJECT,
     react: (
