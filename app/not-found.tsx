@@ -1,5 +1,9 @@
 import Link from "next/link";
 
+// The root layout's Header reads the visitor's auth cookie on every page
+// (Phase 6), so this can no longer be statically prerendered.
+export const instant = false;
+
 export default function NotFound() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6 text-center font-sans">
