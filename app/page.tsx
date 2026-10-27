@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { EventOnMount } from "@/app/components/EventOnMount";
 import { Footer } from "@/app/components/Footer";
 import { WaitlistForm } from "@/app/components/WaitlistForm";
@@ -58,12 +57,6 @@ export default function Home() {
             A guided clarity session, not a prediction. Use simple
             reflection, or start from your numerology numbers.
           </p>
-          <Link
-            href="/session/start"
-            className="rounded-full bg-amber-700 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-amber-800"
-          >
-            Start your free session
-          </Link>
         </section>
 
         {/* Benefits */}
