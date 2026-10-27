@@ -33,10 +33,19 @@ export function CookieNotice() {
   }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 flex flex-col items-center gap-3 border-t border-stone-200 bg-white p-4 text-sm text-stone-600 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-300 sm:flex-row sm:justify-center">
+    // pointer-events-none on the bar + pointer-events-auto on just the link
+    // and button: on short mobile viewports this fixed bar can end up
+    // overlapping page content above it (e.g. the conversation view's Send
+    // button once the chat grows) — without this, the bar's own empty
+    // space/text would block clicks on whatever it's covering, even though
+    // nothing there is actually interactive.
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-center gap-3 border-t border-stone-200 bg-white p-4 text-sm text-stone-600 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-300 sm:flex-row sm:justify-center">
       <p>
         We use a small number of analytics cookies to understand how Clarity is used. See our{" "}
-        <Link href="/privacy" className="underline hover:text-stone-900 dark:hover:text-stone-50">
+        <Link
+          href="/privacy"
+          className="pointer-events-auto underline hover:text-stone-900 dark:hover:text-stone-50"
+        >
           Privacy
         </Link>{" "}
         page for details.
@@ -44,7 +53,7 @@ export function CookieNotice() {
       <button
         type="button"
         onClick={dismiss}
-        className="shrink-0 rounded-full bg-amber-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-800"
+        className="pointer-events-auto shrink-0 rounded-full bg-amber-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-amber-800"
       >
         Got it
       </button>
